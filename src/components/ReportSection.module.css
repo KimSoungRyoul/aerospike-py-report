@@ -1,0 +1,177 @@
+.report {
+  margin-bottom: 20px;
+  padding: 24px 28px;
+  background: var(--s0);
+  border: 1px solid var(--bdr2);
+  border-radius: 10px;
+}
+
+/* ── Title Block ── */
+.titleBlock {
+  text-align: center;
+  padding-bottom: 18px;
+  margin-bottom: 18px;
+  border-bottom: 1px solid var(--bdr);
+}
+
+.reportTitle {
+  font-size: clamp(1rem, 2.4vw, 1.4rem);
+  font-weight: 800;
+  color: var(--tx);
+  line-height: 1.35;
+  margin-bottom: 4px;
+}
+
+.reportSubtitle {
+  font-size: 0.78rem;
+  color: var(--tx2);
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+/* ── Meta Row ── */
+.meta {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.metaItem {
+  font-size: 0.68rem;
+  color: var(--tx3);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.metaLabel {
+  font-weight: 600;
+  color: var(--tx2);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 0.6rem;
+}
+
+.metaValue {
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--tx);
+  font-size: 0.66rem;
+}
+
+/* ── Sections ── */
+.section {
+  margin-top: 18px;
+}
+
+.sectionTitle {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--tx);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--bdr2);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sectionTitle::before {
+  content: '';
+  display: inline-block;
+  width: 3px;
+  height: 12px;
+  border-radius: 2px;
+  background: var(--io);
+}
+
+.sectionBody {
+  font-size: 0.72rem;
+  color: var(--tx2);
+  line-height: 1.7;
+}
+
+.sectionBody p {
+  margin-bottom: 8px;
+}
+
+.sectionBody p:last-child {
+  margin-bottom: 0;
+}
+
+/* ── Highlight Spans ── */
+.bad {
+  color: var(--gil);
+  font-weight: 600;
+}
+
+.good {
+  color: var(--ok);
+  font-weight: 600;
+}
+
+.accent {
+  color: var(--io);
+  font-weight: 600;
+}
+
+/* ── Key Findings List ── */
+.findings {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.finding {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  font-size: 0.7rem;
+  color: var(--tx2);
+  line-height: 1.5;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: var(--s1);
+}
+
+.findingIcon {
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  margin-top: 1px;
+}
+
+/* ── Table of Contents ── */
+.toc {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.tocItem {
+  font-size: 0.66rem;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--tx3);
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: var(--s1);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tocNum {
+  color: var(--io);
+  font-weight: 700;
+  min-width: 16px;
+}
+
+.tocLabel {
+  color: var(--tx2);
+}

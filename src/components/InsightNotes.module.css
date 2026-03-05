@@ -1,0 +1,34 @@
+.nt {
+  padding: 9px 12px;
+  border-radius: 7px;
+  font-size: 0.7rem;
+  display: flex;
+  gap: 7px;
+  align-items: flex-start;
+  margin: 8px 0;
+  line-height: 1.55;
+}
+
+.nt b {
+  font-weight: 600;
+}
+
+.ic {
+  font-size: 0.8rem;
+  flex-shrink: 0;
+}
+
+.key {
+  background: rgba(249, 115, 22, 0.06);
+  border-left: 3px solid var(--tokio);
+}
+
+.warn {
+  background: rgba(239, 68, 68, 0.05);
+  border-left: 3px solid var(--gil);
+}
+
+.insight {
+  background: rgba(16, 185, 129, 0.05);
+  border-left: 3px solid var(--ok);
+}

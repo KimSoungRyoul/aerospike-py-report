@@ -1,0 +1,40 @@
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-top: 6px;
+}
+
+@media (max-width: 600px) {
+  .metrics {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.mc {
+  background: var(--s0);
+  border: 1px solid var(--bdr2, var(--bdr));
+  border-radius: 8px;
+  padding: 8px 6px;
+  text-align: center;
+}
+
+.mcLabel {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  color: var(--tx3);
+  letter-spacing: 0.3px;
+}
+
+.mcValue {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-top: 1px;
+}
+
+.mcSubtitle {
+  font-size: 0.68rem;
+  color: var(--tx3);
+  margin-top: 1px;
+}

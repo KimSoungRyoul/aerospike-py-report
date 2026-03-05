@@ -1,0 +1,24 @@
+@import '../theme/variables.css';
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--bg);
+  color: var(--tx);
+  font-family: 'Noto Sans KR', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.page {
+  max-width: 1260px;
+  margin: 0 auto;
+  padding: 14px 10px 80px;
+}

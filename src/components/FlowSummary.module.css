@@ -1,0 +1,33 @@
+.flow {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin: 8px 0 2px;
+  flex-wrap: wrap;
+}
+
+.flowItem {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  padding: 5px 12px;
+  border-radius: 6px;
+  letter-spacing: 0.2px;
+  line-height: 1.4;
+}
+
+.flowBad {
+  background: rgba(239, 68, 68, 0.06);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  color: var(--gil);
+}
+
+.flowGood {
+  background: rgba(16, 185, 129, 0.06);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  color: var(--ok);
+}
+
+.ar {
+  color: var(--tx3);
+  margin: 0 2px;
+}

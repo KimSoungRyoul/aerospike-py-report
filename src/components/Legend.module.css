@@ -1,0 +1,23 @@
+.lg {
+  display: flex;
+  gap: 9px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 6px 0 3px;
+  font-size: 0.7rem;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--tx2);
+}
+
+.lg span {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.lg i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+}

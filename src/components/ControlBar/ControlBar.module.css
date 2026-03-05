@@ -1,0 +1,72 @@
+.wrapper {
+  margin: 8px 0 4px;
+}
+
+.ctrls {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border: 1px solid var(--bdr);
+  border-radius: 5px;
+  background: var(--s2);
+  color: var(--tx2);
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.btn:hover {
+  border-color: var(--tokio);
+  color: var(--tokio);
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--ev);
+  outline-offset: 2px;
+}
+
+.btnActive {
+  background: rgba(249, 115, 22, 0.08);
+  border-color: var(--tokio);
+  color: var(--tokio);
+}
+
+.btnCyan {
+  background: rgba(6, 182, 212, 0.08);
+  border-color: var(--ev);
+  color: var(--ev);
+}
+
+.btnRed {
+  background: rgba(239, 68, 68, 0.08);
+  border-color: var(--gil);
+  color: var(--gil);
+}
+
+.sep {
+  color: var(--tx3);
+  font-size: 0.68rem;
+  margin: 0 2px;
+}
+
+.info {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--tx3);
+  margin-left: 4px;
+}
+
+.paramLabel {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--tx3);
+}

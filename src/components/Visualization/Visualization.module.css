@@ -1,0 +1,119 @@
+.wrap {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+@media (max-width: 820px) {
+  .wrap {
+    grid-template-columns: 1fr;
+  }
+}
+
+.panel {
+  background: var(--s0);
+  border: 1px solid var(--bdr2, var(--bdr));
+  border-radius: 11px;
+  padding: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+}
+
+.bad::before {
+  background: linear-gradient(90deg, transparent, var(--gil), transparent);
+}
+
+.good::before {
+  background: linear-gradient(90deg, transparent, var(--ok), transparent);
+}
+
+.panelTitle {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.7px;
+  margin-bottom: 3px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.bad .panelTitle {
+  color: var(--gil);
+}
+
+.good .panelTitle {
+  color: var(--ok);
+}
+
+.canvasContainer {
+  position: relative;
+  width: 100%;
+}
+
+.canvasContainer canvas {
+  width: 100%;
+  display: block;
+}
+
+.status {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--tx3);
+  margin-top: 3px;
+  min-height: 32px;
+  line-height: 1.5;
+}
+
+/* Status color classes used in innerHTML */
+.status :global(b) {
+  font-weight: 600;
+}
+
+.status :global(.r) {
+  color: var(--gil);
+}
+
+.status :global(.g) {
+  color: var(--ok);
+}
+
+.status :global(.y) {
+  color: var(--db);
+}
+
+.status :global(.b) {
+  color: var(--io);
+}
+
+.status :global(.p) {
+  color: var(--q);
+}
+
+.tooltip {
+  position: absolute;
+  display: none;
+  background: var(--s2);
+  color: var(--tx);
+  border: 1px solid var(--bdr);
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  pointer-events: none;
+  z-index: 10;
+  white-space: nowrap;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

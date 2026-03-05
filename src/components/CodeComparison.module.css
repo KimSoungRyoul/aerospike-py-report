@@ -1,0 +1,96 @@
+.codeCmp {
+  margin: 8px 0;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.codeCmp summary {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--tx2);
+  cursor: pointer;
+  padding: 8px 12px;
+  background: var(--s0);
+  border: 1px solid var(--bdr2, var(--bdr));
+  border-radius: 7px;
+  transition: all 0.15s;
+  list-style: none;
+}
+
+.codeCmp summary::-webkit-details-marker {
+  display: none;
+}
+
+.codeCmp summary::before {
+  content: '▶ ';
+  font-size: 0.55rem;
+  color: var(--tx3);
+}
+
+.codeCmp[open] summary::before {
+  content: '▼ ';
+}
+
+.codeCmp[open] summary {
+  border-radius: 7px 7px 0 0;
+  border-bottom: none;
+}
+
+.cmpBody {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border: 1px solid var(--bdr2, var(--bdr));
+  border-top: none;
+  border-radius: 0 0 7px 7px;
+  overflow: hidden;
+}
+
+@media (max-width: 600px) {
+  .cmpBody {
+    grid-template-columns: 1fr;
+  }
+}
+
+.cmpCol {
+  padding: 10px 12px;
+  font-size: 0.6rem;
+  line-height: 1.65;
+}
+
+.badCol {
+  background: rgba(239, 68, 68, 0.03);
+  border-right: 1px solid var(--bdr2, var(--bdr));
+}
+
+.goodCol {
+  background: rgba(16, 185, 129, 0.03);
+}
+
+.cmpCol h4 {
+  font-size: 0.6rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+  letter-spacing: 0.5px;
+}
+
+.badCol h4 {
+  color: var(--gil);
+}
+
+.goodCol h4 {
+  color: var(--ok);
+}
+
+.cmpCol code {
+  display: block;
+  color: var(--tx2);
+  margin: 2px 0;
+}
+
+.kw {
+  color: var(--ev);
+}
+
+.cm {
+  color: var(--tx3);
+}
