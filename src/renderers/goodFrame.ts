@@ -15,25 +15,28 @@ export function drawGoodFrame(
 ): void {
   const { goodInferStart, goodInferEnd } = meta;
 
-  // ── Layout: CPython Interpreter (small box at top) ──
-  const cpY = 6;
-  const evY = cpY + 16, evH = 24;
-  const brY = evY + evH + 4, brH = 13;
-  const cpBottom = brY + brH + 4;
-  const cpH = cpBottom - cpY;
-
-  // ── Layout: Tokio + PyTorch side-by-side (outside CPython) ──
-  const gap = 6;
-  const parallelY = cpBottom + 6;
+  // ── Shared layer positions (matches bad panel) ──
+  const cpY = 8;
   const netY = H - 100;
   const dbY = H - 52, dbH = 34;
-  const parallelH = netY - parallelY - 10;
+  const usableH = netY - cpY - 12;
+  const cpH = Math.floor(usableH * 0.55);
+  const nativeY = cpY + cpH + 6;
+  const nativeH = netY - nativeY - 6;
 
+  // CPython internals
+  const evY = cpY + 16, evH = 28;
+  const brY = evY + evH + 5, brH = 16;
+
+  // Native Thread Layer internals
+  const nContentY = nativeY + 14;
+  const nContentH = nativeH - 18;
+  const ptGap = 6;
   const totalW = W - 16;
-  const tokioW = Math.floor(totalW * 0.70 - gap / 2);
-  const pytorchW = totalW - tokioW - gap;
+  const tokioW = Math.floor(totalW * 0.70 - ptGap / 2);
+  const pytorchW = totalW - tokioW - ptGap;
   const tokioX = 8;
-  const pytorchX = tokioX + tokioW + gap;
+  const pytorchX = tokioX + tokioW + ptGap;
 
   // ── CPython Interpreter boundary ──
   rr(ctx, 4, cpY, W - 8, cpH, 6, 'rgba(59,130,246,.06)', 'rgba(59,130,246,.55)', 2);
@@ -73,24 +76,26 @@ export function drawGoodFrame(
       'GIL ~12μs (F' + (touching[0].i + 1) + ')', C.ok, 6, 'center', 'bold');
   }
 
-  // ════════════════════════════════════════════════════════════
-  // ── Tokio Runtime (outside CPython, left 70%) ──
-  // ════════════════════════════════════════════════════════════
-  rr(ctx, tokioX, parallelY, tokioW, parallelH, 5,
+  // ── Native / OS Thread Layer boundary ──
+  rr(ctx, 4, nativeY, W - 8, nativeH, 7, 'rgba(30,40,60,.08)', 'rgba(30,42,72,.3)', 1.5);
+  txt(ctx, 10, nativeY + 9, 'Native Thread Layer', C.tx3, 7.5, 'left', '600');
+
+  // ── Tokio Runtime (left 70%) ──
+  rr(ctx, tokioX, nContentY, tokioW, nContentH, 5,
     'rgba(249,115,22,.04)', 'rgba(249,115,22,.4)', 2);
-  txt(ctx, tokioX + 6, parallelY + 10, 'Tokio Runtime', C.tokio, 8, 'left', 'bold');
+  txt(ctx, tokioX + 6, nContentY + 10, 'Tokio Runtime', C.tokio, 8, 'left', 'bold');
 
   if (hitRegions) {
     hitRegions.push({
       id: 'good-tokio-runtime',
-      x: tokioX, y: parallelY, w: tokioW, h: parallelH,
+      x: tokioX, y: nContentY, w: tokioW, h: nContentH,
       tooltip: 'Tokio 비동기 런타임 — GIL 없이 네이티브 스레드에서 실행',
     });
   }
 
   // Worker columns inside Tokio
-  const wY = parallelY + 22;
-  const wH = parallelH - 26;
+  const wY = nContentY + 22;
+  const wH = nContentH - 26;
   const wW = (tokioW - 8 - 3 * (tokioWorkers - 1)) / tokioWorkers;
   const tasksByW: GoodScheduleItem[][] = Array.from({ length: tokioWorkers }, () => []);
   schedule.forEach((s, i) => tasksByW[i % tokioWorkers].push(s));
@@ -180,9 +185,7 @@ export function drawGoodFrame(
     });
   }
 
-  // ════════════════════════════════════════════════════════════
-  // ── PyTorch Native Threads (outside CPython, right 30%) ──
-  // ════════════════════════════════════════════════════════════
+  // ── PyTorch Native Threads (right 30%) ──
   {
     const inferActive = time >= goodInferStart;
     const p = inferActive
@@ -195,27 +198,27 @@ export function drawGoodFrame(
       ctx.shadowColor = 'rgba(168,85,247,.25)';
       ctx.shadowBlur = 10;
     }
-    rr(ctx, pytorchX, parallelY, pytorchW, parallelH, 5,
+    rr(ctx, pytorchX, nContentY, pytorchW, nContentH, 5,
       'rgba(168,85,247,' + pulse + ')',
       inferActive ? 'rgba(168,85,247,.5)' : 'rgba(168,85,247,.2)', 2);
     ctx.restore();
 
-    txt(ctx, pytorchX + pytorchW / 2, parallelY + 10,
+    txt(ctx, pytorchX + pytorchW / 2, nContentY + 10,
       '🔥 PyTorch Native Threads', C.cpu, 7.5, 'center', '700');
-    txt(ctx, pytorchX + pytorchW / 2, parallelY + 21,
+    txt(ctx, pytorchX + pytorchW / 2, nContentY + 21,
       '(GIL-free) C++ / CUDA', C.cpu, 6, 'center');
 
     if (inferActive) {
       // Progress label
-      txt(ctx, pytorchX + pytorchW / 2, parallelY + 36,
+      txt(ctx, pytorchX + pytorchW / 2, nContentY + 36,
         'Inference ' + (p * 100).toFixed(0) + '%', C.cpu, 8.5, 'center', '700');
 
       // 4 stages stacked vertically
       const stageLabels = ['matmul', 'ReLU', 'softmax', 'output'];
       const nStages = stageLabels.length;
       const stageGap = 4;
-      const stageStartY = parallelY + 46;
-      const stageAreaH = parallelH - 54;
+      const stageStartY = nContentY + 46;
+      const stageAreaH = nContentH - 54;
       const stageH = (stageAreaH - (nStages - 1) * stageGap) / nStages;
 
       for (let si = 0; si < nStages; si++) {
@@ -259,7 +262,7 @@ export function drawGoodFrame(
     if (hitRegions) {
       hitRegions.push({
         id: 'good-pytorch',
-        x: pytorchX, y: parallelY, w: pytorchW, h: parallelH,
+        x: pytorchX, y: nContentY, w: pytorchW, h: nContentH,
         tooltip: inferActive
           ? `PyTorch Inference — ${(p * 100).toFixed(0)}%`
           : 'PyTorch Native Threads (대기)',

@@ -18,24 +18,37 @@ export function drawBadFrame(
   C: CanvasTheme,
   hitRegions?: HitRegion[],
 ): void {
-  // ── Layout constants ──
-  const cpY = 10;
-  const evY = cpY + 16, evH = 28;
-  const gilBarY = evY + evH + 5;
-  const gilBarH = 38;
-  const poolTopY = gilBarY + gilBarH + 5;
-  const showSlots = Math.min(Math.min(N, poolSize), 12);
-  const slotH = Math.max(10, Math.min(20, (H - poolTopY - 170) / showSlots - 2));
-  const poolH = showSlots * (slotH + 2) + 14;
-  const cpBottom = poolTopY + poolH + 4;
-  const cpH = cpBottom - cpY;
+  // ── Shared layer positions (matches good panel) ──
+  const cpY = 8;
   const netY = H - 100;
   const dbY = H - 52, dbH = 34;
+  const usableH = netY - cpY - 12;
+  const cpH = Math.floor(usableH * 0.55);
+  const nativeY = cpY + cpH + 6;
+  const nativeH = netY - nativeY - 6;
+
+  // CPython internals
+  const evY = cpY + 16, evH = 28;
+  const gilBarY = evY + evH + 5;
+  const gilBarH = 34;
+  const poolTopY = gilBarY + gilBarH + 5;
+  const showSlots = Math.min(Math.min(N, poolSize), 12);
+  const poolAvail = cpY + cpH - poolTopY - 4;
+  const slotH = Math.max(10, Math.min(20, (poolAvail - 14) / showSlots - 2));
+  const poolH = showSlots * (slotH + 2) + 14;
 
   const hasQueue = N > poolSize;
   const queueW = hasQueue ? 52 : 0;
   const poolX = 10 + queueW;
   const poolW = W - 20 - queueW;
+
+  // Native Thread Layer internals (PyTorch right 30%)
+  const ptGap = 6;
+  const totalW = W - 16;
+  const pytorchW = Math.floor(totalW * 0.30 - ptGap / 2);
+  const pytorchX = W - 8 - pytorchW;
+  const nContentY = nativeY + 14;
+  const nContentH = nativeH - 18;
 
   // ── Current contention stats ──
   const contending = schedule.filter(
@@ -267,67 +280,76 @@ export function drawBadFrame(
   // ── Aerospike ──
   drawAerospikeCluster(ctx, W, dbY, dbH, C);
 
-  // ── predict() — PyTorch C++/CUDA (runs outside CPython) ──
-  if (time >= meta.badInferStart) {
-    const p = Math.min(1, (time - meta.badInferStart) / (meta.badInferEnd - meta.badInferStart));
+  // ── Native Thread Layer boundary ──
+  rr(ctx, 4, nativeY, W - 8, nativeH, 7, 'rgba(30,40,60,.08)', 'rgba(30,42,72,.3)', 1.5);
+  txt(ctx, 10, nativeY + 9, 'Native Thread Layer', C.tx3, 7.5, 'left', '600');
 
-    // Torch native thread area (below CPython Interpreter boundary)
-    const torchY = cpBottom + 6;
-    const torchH = netY - torchY - 6;
-    if (torchH > 30) {
-      const pulse = 0.03 + 0.015 * Math.sin(time * 18);
-      ctx.save();
+  // ── PyTorch Native Threads (right 30%, inside Native Thread Layer) ──
+  {
+    const inferActive = time >= meta.badInferStart;
+    const p = inferActive
+      ? Math.min(1, (time - meta.badInferStart) / (meta.badInferEnd - meta.badInferStart))
+      : 0;
+
+    const pulse = inferActive ? 0.03 + 0.015 * Math.sin(time * 18) : 0.02;
+    ctx.save();
+    if (inferActive) {
       ctx.shadowColor = 'rgba(168,85,247,.25)';
       ctx.shadowBlur = 10;
-      rr(ctx, 10, torchY, W - 20, torchH, 6,
-        'rgba(168,85,247,' + pulse + ')', 'rgba(168,85,247,.5)', 2);
-      ctx.restore();
+    }
+    rr(ctx, pytorchX, nContentY, pytorchW, nContentH, 5,
+      'rgba(168,85,247,' + pulse + ')',
+      inferActive ? 'rgba(168,85,247,.5)' : 'rgba(168,85,247,.2)', 2);
+    ctx.restore();
 
-      txt(ctx, 16, torchY + 10,
-        '🔥 PyTorch Native Threads (GIL-free)',
-        C.cpu, 8.5, 'left', '700');
-      txt(ctx, W - 26, torchY + 10, 'C++ / CUDA',
-        C.cpu, 7.5, 'right', '600');
+    txt(ctx, pytorchX + pytorchW / 2, nContentY + 10,
+      '🔥 PyTorch Native Threads', C.cpu, 7.5, 'center', '700');
+    txt(ctx, pytorchX + pytorchW / 2, nContentY + 21,
+      '(GIL-free) C++ / CUDA', C.cpu, 6, 'center');
 
-      const nW = 4, wGap = 4;
-      const twW = ((W - 36) - (nW - 1) * wGap) / nW;
+    if (inferActive) {
+      txt(ctx, pytorchX + pytorchW / 2, nContentY + 36,
+        'Inference ' + (p * 100).toFixed(0) + '%', C.cpu, 8.5, 'center', '700');
 
-      for (let wi = 0; wi < nW; wi++) {
-        const twx = 14 + wi * (twW + wGap);
-        const twY = torchY + 18;
-        const twH = torchH - 24;
-        const isActive = p > wi / nW && p < (wi + 1.5) / nW;
-        const isDone = p >= (wi + 1) / nW;
+      const stageLabels = ['matmul', 'ReLU', 'softmax', 'output'];
+      const nStages = stageLabels.length;
+      const stageGap = 4;
+      const stageStartY = nContentY + 46;
+      const stageAreaH = nContentH - 54;
+      const stageH = (stageAreaH - (nStages - 1) * stageGap) / nStages;
+
+      for (let si = 0; si < nStages; si++) {
+        const sy = stageStartY + si * (stageH + stageGap);
+        const isDone = p >= (si + 1) / nStages;
+        const isActive = p > si / nStages && !isDone;
+
         const colFill = isDone
           ? 'rgba(168,85,247,.15)'
-          : isActive
-            ? 'rgba(168,85,247,.1)'
-            : 'rgba(168,85,247,.03)';
+          : isActive ? 'rgba(168,85,247,.1)' : 'rgba(168,85,247,.03)';
         const bdr = isDone
           ? 'rgba(168,85,247,.3)'
-          : isActive
-            ? 'rgba(168,85,247,.22)'
-            : 'rgba(168,85,247,.08)';
-        rr(ctx, twx, twY, twW, twH, 4, colFill, bdr);
+          : isActive ? 'rgba(168,85,247,.22)' : 'rgba(168,85,247,.08)';
 
-        const labels = ['matmul', 'ReLU', 'softmax', 'output'];
-        txt(ctx, twx + twW / 2, twY + twH / 2 - 2, labels[wi],
+        rr(ctx, pytorchX + 4, sy, pytorchW - 8, stageH, 4, colFill, bdr, 1.5);
+
+        txt(ctx, pytorchX + pytorchW / 2, sy + stageH / 2 + 2,
+          stageLabels[si],
           isActive || isDone ? C.cpu : C.tx3, 7.5, 'center',
           isActive ? '700' : '');
 
         if (isActive) {
-          const sh = 0.08 + 0.06 * Math.sin(time * 35 + wi * 2);
-          ctx.fillStyle = 'rgba(168,85,247,' + sh + ')';
+          const shimmer = 0.08 + 0.06 * Math.sin(time * 35 + si * 2);
+          ctx.fillStyle = 'rgba(168,85,247,' + shimmer + ')';
           ctx.beginPath();
-          ctx.roundRect(twx, twY, twW, twH, 4);
+          ctx.roundRect(pytorchX + 4, sy, pytorchW - 8, stageH, 4);
           ctx.fill();
-          const localP = (p - wi / nW) * nW;
-          rr(ctx, twx + 2, twY + twH - 5,
-            Math.max(0, (twW - 4) * Math.min(localP, 1)), 3, 1.5,
+          const localP = (p - si / nStages) * nStages;
+          rr(ctx, pytorchX + 6, sy + stageH - 5,
+            Math.max(0, (pytorchW - 12) * Math.min(localP, 1)), 3, 1.5,
             'rgba(168,85,247,.35)');
         }
         if (isDone) {
-          txt(ctx, twx + twW / 2, twY + twH / 2 + 7, '✓',
+          txt(ctx, pytorchX + pytorchW - 12, sy + stageH / 2 + 2, '✓',
             C.ok, 7, 'center', 'bold');
         }
       }
